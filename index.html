@@ -4,13 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>景区增长AI V32</title>
+<title>景区增长AI V33</title>
 
 <style>
 
-body{
+*{
 margin:0;
-font-family:Arial;
+padding:0;
+box-sizing:border-box;
+font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+body{
 background:#0f172a;
 color:white;
 }
@@ -18,149 +23,338 @@ color:white;
 .header{
 padding:30px;
 text-align:center;
-background:linear-gradient(90deg,#2563eb,#7c3aed);
+background:linear-gradient(135deg,#2563eb,#7c3aed);
 }
 
 .header h1{
-margin:0;
 font-size:32px;
+margin-bottom:10px;
+}
+
+.header p{
+opacity:.9;
 }
 
 .container{
 padding:20px;
+max-width:1200px;
+margin:auto;
 }
 
 .card{
 background:#1e293b;
 padding:20px;
-border-radius:15px;
+border-radius:16px;
+margin-bottom:15px;
+box-shadow:0 8px 20px rgba(0,0,0,.2);
+}
+
+h2{
 margin-bottom:15px;
 }
 
 select{
 width:100%;
-padding:12px;
+padding:14px;
 border:none;
-border-radius:10px;
+border-radius:12px;
 font-size:16px;
+margin-top:10px;
+}
+
+input{
+width:100%;
+padding:14px;
+border:none;
+border-radius:12px;
+font-size:16px;
+margin-top:10px;
 }
 
 button{
 width:100%;
 padding:15px;
-background:#22c55e;
 border:none;
-border-radius:10px;
+border-radius:12px;
 font-size:18px;
-color:white;
-margin-top:15px;
-}
-
-.result{
-margin-top:20px;
-}
-
-.score{
-font-size:48px;
 font-weight:bold;
-color:#22c55e;
+cursor:pointer;
+margin-top:15px;
+background:#22c55e;
+color:white;
+}
+
+button:hover{
+opacity:.9;
+}
+
+.grid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:15px;
+}
+
+.metric{
+text-align:center;
+padding:15px;
+background:#334155;
+border-radius:12px;
+}
+
+.metric h3{
+font-size:14px;
+opacity:.8;
+}
+
+.metric p{
+font-size:28px;
+font-weight:bold;
+margin-top:8px;
+}
+
+.report{
+white-space:pre-wrap;
+line-height:1.8;
+}
+
+.loading{
+text-align:center;
+padding:30px;
+font-size:18px;
+}
+
+.footer{
+text-align:center;
+padding:20px;
+opacity:.6;
+}
+
+@media(max-width:768px){
+.grid{
+grid-template-columns:1fr;
+}
 }
 
 </style>
-
 </head>
 
 <body>
 
 <div class="header">
-<h1>景区增长AI V32</h1>
-<p>景区运营增长诊断系统</p>
+<h1>景区增长AI V33</h1>
+<p>AI景区运营诊断平台</p>
 </div>
 
 <div class="container">
 
 <div class="card">
 
-<h3>选择景区</h3>
+<h2>景区信息</h2>
 
 <select id="scenic">
-
 <option>云台山</option>
-
 <option>老君山</option>
-
-<option>清明上河园</option>
-
-<option>龙门石窟</option>
-
 <option>宝泉</option>
-
+<option>龙门石窟</option>
+<option>清明上河园</option>
 </select>
 
+<input
+id="apikey"
+type="password"
+placeholder="请输入你的 DeepSeek API Key">
+
 <button onclick="runAI()">
-生成增长诊断
+生成AI增长诊断
 </button>
 
 </div>
+
+<div id="dashboard"></div>
 
 <div id="result"></div>
 
 </div>
 
+<div class="footer">
+景区增长AI V33
+</div>
+
 <script>
 
-function runAI(){
+/* 第2部分代码放这里 */
+async function runAI(){
 
-let scenic =
+const scenic =
 document.getElementById("scenic").value;
 
-let score =
-Math.floor(Math.random()*20)+80;
+const apiKey =
+document.getElementById("apikey").value.trim();
+
+if(!apiKey){
+
+alert("请输入 DeepSeek API Key");
+
+return;
+
+}
+
+document.getElementById("dashboard").innerHTML="";
 
 document.getElementById("result").innerHTML=
+`
+<div class="card loading">
+🤖 AI正在分析景区数据...
+</div>
+`;
 
+try{
+
+const response = await fetch(
+"https://api.deepseek.com/v1/chat/completions",
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json",
+"Authorization":"Bearer "+apiKey
+},
+body:JSON.stringify({
+
+model:"deepseek-chat",
+
+messages:[
+
+{
+role:"system",
+content:
+"你是一名资深景区运营顾问、文旅营销专家和抖音运营专家。"
+},
+
+{
+role:"user",
+content:
+`
+请针对${scenic}进行景区增长诊断。
+
+输出格式：
+
+一、景区现状分析
+
+二、核心问题
+
+三、增长机会
+
+四、抖音运营建议
+
+五、90天增长计划
+
+六、预计效果
+
+内容详细专业。
+`
+}
+
+],
+
+temperature:0.7
+
+})
+}
+);
+
+const data =
+await response.json();
+
+const report =
+data.choices[0].message.content;
+
+renderDashboard(scenic);
+
+document.getElementById("result").innerHTML=
+`
+<div class="card">
+
+<h2>
+${scenic} AI增长诊断报告
+</h2>
+
+<div class="report">
+${report}
+</div>
+
+</div>
+`;
+
+}catch(error){
+
+document.getElementById("result").innerHTML=
+`
+<div class="card">
+
+<h2>调用失败</h2>
+
+<p>
+${error}
+</p>
+
+</div>
+`;
+
+}
+
+}
+function renderDashboard(name){
+
+const score =
+Math.floor(Math.random()*10)+88;
+
+const flow =
+Math.floor(Math.random()*50)+100;
+
+const roi =
+Math.floor(Math.random()*80)+120;
+
+const growth =
+Math.floor(Math.random()*40)+20;
+
+document.getElementById("dashboard").innerHTML=
 `
 
 <div class="card">
 
-<h2>${scenic}</h2>
+<h2>
+${name} 增长驾驶舱
+</h2>
 
-<div class="score">${score}</div>
+<div class="grid">
 
-<p>综合增长指数</p>
-
+<div class="metric">
+<h3>增长指数</h3>
+<p>${score}</p>
 </div>
 
-<div class="card">
-
-<h3>AI诊断结果</h3>
-
-<p>
-当前景区流量具备增长空间，
-建议强化短视频传播、
-优化节假日活动、
-提升私域转化能力。
-</p>
-
+<div class="metric">
+<h3>客流潜力</h3>
+<p>${flow}%</p>
 </div>
 
-<div class="card">
+<div class="metric">
+<h3>ROI预测</h3>
+<p>${roi}%</p>
+</div>
 
-<h3>未来90天建议</h3>
+<div class="metric">
+<h3>增长空间</h3>
+<p>${growth}%</p>
+</div>
 
-<p>
-①达人合作<br>
-②抖音投流<br>
-③活动策划<br>
-④会员体系建设
-</p>
+</div>
 
 </div>
 
 `;
 
 }
-
 </script>
 
 </body>
