@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>景区增长AI V32</title>
+
+<style>
+
+body{
+margin:0;
+font-family:Arial;
+background:#0f172a;
+color:white;
+}
+
+.header{
+padding:30px;
+text-align:center;
+background:linear-gradient(90deg,#2563eb,#7c3aed);
+}
+
+.header h1{
+margin:0;
+font-size:32px;
+}
+
+.container{
+padding:20px;
+}
+
+.card{
+background:#1e293b;
+padding:20px;
+border-radius:15px;
+margin-bottom:15px;
+}
+
+select{
+width:100%;
+padding:12px;
+border:none;
+border-radius:10px;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:15px;
+background:#22c55e;
+border:none;
+border-radius:10px;
+font-size:18px;
+color:white;
+margin-top:15px;
+}
+
+.result{
+margin-top:20px;
+}
+
+.score{
+font-size:48px;
+font-weight:bold;
+color:#22c55e;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+<h1>景区增长AI V32</h1>
+<p>景区运营增长诊断系统</p>
+</div>
+
+<div class="container">
+
+<div class="card">
+
+<h3>选择景区</h3>
+
+<select id="scenic">
+
+<option>云台山</option>
+
+<option>老君山</option>
+
+<option>清明上河园</option>
+
+<option>龙门石窟</option>
+
+<option>宝泉</option>
+
+</select>
+
+<button onclick="runAI()">
+生成增长诊断
+</button>
+
+</div>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+function runAI(){
+
+let scenic =
+document.getElementById("scenic").value;
+
+let score =
+Math.floor(Math.random()*20)+80;
+
+document.getElementById("result").innerHTML=
+
+`
+
+<div class="card">
+
+<h2>${scenic}</h2>
+
+<div class="score">${score}</div>
+
+<p>综合增长指数</p>
+
+</div>
+
+<div class="card">
+
+<h3>AI诊断结果</h3>
+
+<p>
+当前景区流量具备增长空间，
+建议强化短视频传播、
+优化节假日活动、
+提升私域转化能力。
+</p>
+
+</div>
+
+<div class="card">
+
+<h3>未来90天建议</h3>
+
+<p>
+①达人合作<br>
+②抖音投流<br>
+③活动策划<br>
+④会员体系建设
+</p>
+
+</div>
+
+`;
+
+}
+
+</script>
+
+</body>
+</html>
