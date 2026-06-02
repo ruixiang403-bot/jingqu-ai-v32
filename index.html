@@ -1,13 +1,21 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
 
 <meta charset="UTF-8">
+
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>景区增长AI V34</title>
+<title>景区增长AI V35 商业版</title>
 
-<style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<style id="main-style">
 *{
 margin:0;
 padding:0;
@@ -25,84 +33,52 @@ color:#111827;
 }
 
 .app{
-max-width:900px;
+max-width:1200px;
 margin:auto;
 padding:20px;
 }
 
 .header{
-text-align:center;
+display:flex;
+justify-content:space-between;
+align-items:center;
 margin-bottom:20px;
 }
 
 .header h1{
 font-size:34px;
-font-weight:700;
+font-weight:800;
 }
 
 .header p{
-margin-top:8px;
 color:#6b7280;
+margin-top:6px;
+}
+
+.badge{
+background:#22c55e;
+color:white;
+padding:10px 16px;
+border-radius:999px;
+font-size:14px;
+font-weight:700;
 }
 
 .card{
 background:white;
+padding:22px;
 border-radius:24px;
-padding:20px;
 margin-bottom:18px;
 box-shadow:
 0 4px 16px rgba(0,0,0,0.05);
 }
 
-.hero{
-text-align:center;
+.card h2{
+margin-bottom:16px;
+font-size:20px;
 }
 
-.score-label{
-font-size:16px;
-color:#6b7280;
-}
-
-.score{
-font-size:68px;
-font-weight:800;
-color:#22c55e;
-margin-top:10px;
-}
-
-.grid4{
-display:grid;
-grid-template-columns:
-repeat(2,1fr);
-gap:12px;
-margin-bottom:18px;
-}
-
-.mini-card{
-background:white;
-padding:18px;
-border-radius:20px;
-box-shadow:
-0 4px 16px rgba(0,0,0,0.05);
-}
-
-.mini-title{
-font-size:14px;
-color:#6b7280;
-}
-
-.mini-value{
-font-size:28px;
-font-weight:700;
-margin-top:8px;
-color:#22c55e;
-}
-
-h2{
-font-size:18px;
-margin-bottom:12px;
-}
-
+select,
 input{
 width:100%;
 padding:16px;
@@ -110,31 +86,57 @@ border-radius:16px;
 border:1px solid #e5e7eb;
 font-size:16px;
 outline:none;
+background:white;
 }
 
+select:focus,
 input:focus{
 border-color:#22c55e;
 }
 
 .generate-btn{
 width:100%;
-border:none;
 padding:18px;
+border:none;
+border-radius:18px;
+cursor:pointer;
 font-size:18px;
 font-weight:700;
-border-radius:22px;
-cursor:pointer;
-
 background:
 linear-gradient(
 135deg,
 #22c55e,
 #f5b700
 );
-
 color:white;
+}
 
+.dashboard-grid{
+display:grid;
+grid-template-columns:
+repeat(4,1fr);
+gap:14px;
 margin-bottom:18px;
+}
+
+.metric-card{
+background:white;
+border-radius:24px;
+padding:20px;
+box-shadow:
+0 4px 16px rgba(0,0,0,0.05);
+}
+
+.metric-title{
+font-size:14px;
+color:#6b7280;
+}
+
+.metric-value{
+font-size:32px;
+font-weight:800;
+margin-top:8px;
+color:#22c55e;
 }
 
 .roi-grid{
@@ -146,150 +148,164 @@ gap:12px;
 
 .roi-item{
 background:#fafafa;
-padding:16px;
-border-radius:16px;
+padding:18px;
+border-radius:18px;
 }
 
 .roi-item span{
 display:block;
-color:#6b7280;
 font-size:14px;
+color:#6b7280;
 }
 
 .roi-item b{
-font-size:24px;
+font-size:26px;
 color:#f5b700;
 }
 
-#personaBox,
-#result,
-#roadmap{
+.table{
+width:100%;
+border-collapse:collapse;
+}
+
+.table th{
+text-align:left;
+padding:14px;
+background:#f9fafb;
+}
+
+.table td{
+padding:14px;
+border-bottom:
+1px solid #f1f5f9;
+}
+
+#result{
+white-space:pre-wrap;
 line-height:1.8;
 font-size:15px;
+}
+
+#roadmap{
+line-height:2;
 white-space:pre-wrap;
+}
+
+.premium{
+border:
+2px solid #22c55e;
+}
+
+.upgrade-btn{
+width:100%;
+padding:16px;
+border:none;
+border-radius:16px;
+background:#111827;
+color:white;
+font-size:16px;
+font-weight:700;
+cursor:pointer;
+margin-top:15px;
+}
+
+canvas{
+width:100% !important;
+max-height:350px;
+}
+
+ul{
+padding-left:20px;
+line-height:2;
+}
+
+@media(max-width:900px){
+
+.dashboard-grid{
+grid-template-columns:
+repeat(2,1fr);
+}
+
 }
 
 @media(max-width:600px){
 
-.score{
-font-size:58px;
+.header{
+flex-direction:column;
+align-items:flex-start;
+gap:12px;
 }
 
-.generate-btn{
-font-size:17px;
+.dashboard-grid{
+grid-template-columns:1fr;
+}
+
+.roi-grid{
+grid-template-columns:1fr;
+}
+
+.metric-value{
+font-size:28px;
 }
 
 }
 </style>
+
 </head>
 
 <body>
 
 <div class="app">
 
+<!-- 顶部 -->
+
 <div class="header">
+
+<div>
 
 <h1>景区增长AI</h1>
 
-<p>Growth Intelligence Dashboard</p>
+<p>Scenic Growth Intelligence Dashboard</p>
 
 </div>
 
+<div class="badge">
 
-<div class="card hero">
-
-<div class="score-label">
-综合增长指数
-</div>
-
-<div id="growthScore" class="score">
-92
-</div>
-
-</div>
-
-
-<div class="grid4">
-
-<div class="mini-card">
-
-<div class="mini-title">
-品牌影响力
-</div>
-
-<div id="brandScore" class="mini-value">
-88
-</div>
-
-</div>
-
-
-<div class="mini-card">
-
-<div class="mini-title">
-传播能力
-</div>
-
-<div id="spreadScore" class="mini-value">
-91
-</div>
-
-</div>
-
-
-<div class="mini-card">
-
-<div class="mini-title">
-转化能力
-</div>
-
-<div id="convertScore" class="mini-value">
-86
-</div>
-
-</div>
-
-
-<div class="mini-card">
-
-<div class="mini-title">
-复购能力
-</div>
-
-<div id="repurchaseScore" class="mini-value">
-83
-</div>
+企业演示版
 
 </div>
 
 </div>
 
+<!-- 景区配置 -->
 
 <div class="card">
 
-<h2>景区名称</h2>
+<h2>景区选择</h2>
 
-<input
-id="spotName"
-type="text"
-placeholder="输入景区名称"
-/>
+<select id="spotSelect">
 
-</div>
+<option value="宝泉">宝泉</option>
 
+<option value="云台山">云台山</option>
 
-<div class="card">
+<option value="老君山">老君山</option>
 
-<h2>DeepSeek API Key</h2>
+<option value="清明上河园">清明上河园</option>
+
+<option value="龙门石窟">龙门石窟</option>
+
+</select>
+
+<br><br>
 
 <input
 id="apiKey"
 type="password"
-placeholder="sk-xxxx"
+placeholder="输入 DeepSeek API Key"
 />
 
-</div>
-
+<br><br>
 
 <button
 class="generate-btn"
@@ -299,6 +315,73 @@ AI生成增长方案
 
 </button>
 
+</div>
+
+<!-- 核心驾驶舱 -->
+
+<div class="dashboard-grid">
+
+<div class="metric-card">
+
+<div class="metric-title">
+今日客流
+</div>
+
+<div id="trafficValue" class="metric-value">
+12568
+</div>
+
+</div>
+
+<div class="metric-card">
+
+<div class="metric-title">
+今日收入
+</div>
+
+<div id="incomeValue" class="metric-value">
+¥386500
+</div>
+
+</div>
+
+<div class="metric-card">
+
+<div class="metric-title">
+增长率
+</div>
+
+<div id="growthValue" class="metric-value">
+28%
+</div>
+
+</div>
+
+<div class="metric-card">
+
+<div class="metric-title">
+AI评分
+</div>
+
+<div id="scoreValue" class="metric-value">
+92
+</div>
+
+</div>
+
+</div>
+
+<!-- 客流趋势 -->
+
+<div class="card">
+
+<h2>近7天客流趋势</h2>
+
+<canvas id="trafficChart"></canvas>
+
+</div>
+
+<!-- ROI分析 -->
 
 <div class="card">
 
@@ -350,29 +433,81 @@ AI生成增长方案
 
 </div>
 
+<!-- 游客画像 -->
 
 <div class="card">
 
 <h2>游客画像</h2>
 
-<div id="personaBox">
-
-25-40岁家庭客群占比最高
-
-女性游客58%
-
-亲子消费贡献43%
-
-夜游需求持续增长
+<canvas id="personaChart"></canvas>
 
 </div>
 
-</div>
-
+<!-- 竞品分析 -->
 
 <div class="card">
 
-<h2>AI诊断结果</h2>
+<h2>竞品热度对比</h2>
+
+<table class="table">
+
+<thead>
+
+<tr>
+
+<th>景区</th>
+
+<th>热度指数</th>
+
+</tr>
+
+</thead>
+
+<tbody id="competitorTable">
+
+<tr>
+
+<td>老君山</td>
+
+<td>98</td>
+
+</tr>
+
+<tr>
+
+<td>云台山</td>
+
+<td>95</td>
+
+</tr>
+
+<tr>
+
+<td>宝泉</td>
+
+<td>92</td>
+
+</tr>
+
+<tr>
+
+<td>当前景区</td>
+
+<td>87</td>
+
+</tr>
+
+</tbody>
+
+</table>
+
+</div>
+
+<!-- AI分析 -->
+
+<div class="card">
+
+<h2>AI增长总监</h2>
 
 <div id="result">
 
@@ -382,6 +517,7 @@ AI生成增长方案
 
 </div>
 
+<!-- 路线图 -->
 
 <div class="card">
 
@@ -391,40 +527,259 @@ AI生成增长方案
 
 Day30 完成账号矩阵建设
 
-Day60 打造爆款视频
+Day60 打造爆款内容
 
-Day90 建立私域社群
+Day90 建立私域体系
 
-Day120 推出夜游产品
+Day120 夜游产品上线
 
-Day180 形成增长闭环
-
-</div>
+Day180 完成增长闭环
 
 </div>
 
 </div>
 
-<script>
-async function generatePlan() {
+<!-- 企业版 -->
 
-const apiKey =
-document.getElementById("apiKey").value.trim();
+<div class="card premium">
 
-const spotName =
-document.getElementById("spotName").value.trim();
+<h2>企业版能力</h2>
 
-const resultBox =
-document.getElementById("result");
+<ul>
 
-if(!apiKey){
-alert("请输入DeepSeek API Key");
-return;
+<li>AI增长诊断</li>
+
+<li>竞品监测</li>
+
+<li>ROI预测</li>
+
+<li>PDF报告导出</li>
+
+<li>PPT汇报导出</li>
+
+<li>景区运营周报</li>
+
+</ul>
+
+<button class="upgrade-btn">
+
+升级企业版
+
+</button>
+
+</div>
+
+</div>
+
+<script id="main-script">
+const scenicData = {
+
+"宝泉":{
+traffic:12568,
+income:"¥386500",
+growth:"28%",
+score:92,
+trend:[8200,9300,10500,11200,12500,14800,16800],
+persona:[90,85,72,60,88,75]
+},
+
+"云台山":{
+traffic:18620,
+income:"¥568000",
+growth:"35%",
+score:96,
+trend:[12000,12800,13500,15200,16800,18900,21000],
+persona:[80,90,70,85,92,60]
+},
+
+"老君山":{
+traffic:23500,
+income:"¥860000",
+growth:"42%",
+score:98,
+trend:[15000,16500,18000,19500,21000,23800,26000],
+persona:[75,95,65,80,98,88]
+},
+
+"清明上河园":{
+traffic:9800,
+income:"¥268000",
+growth:"23%",
+score:88,
+trend:[6200,7100,7600,8200,9000,9800,11000],
+persona:[88,70,78,65,82,58]
+},
+
+"龙门石窟":{
+traffic:14500,
+income:"¥450000",
+growth:"31%",
+score:91,
+trend:[9000,9800,10500,11800,12600,13800,15000],
+persona:[72,85,80,90,84,55]
 }
 
-if(!spotName){
-alert("请输入景区名称");
+};
+
+let trafficChart;
+let personaChart;
+
+function loadScenicData(){
+
+const scenic =
+document.getElementById("spotSelect").value;
+
+const data =
+scenicData[scenic];
+
+document.getElementById(
+"trafficValue"
+).innerText = data.traffic;
+
+document.getElementById(
+"incomeValue"
+).innerText = data.income;
+
+document.getElementById(
+"growthValue"
+).innerText = data.growth;
+
+document.getElementById(
+"scoreValue"
+).innerText = data.score;
+
+drawTrafficChart(data.trend);
+
+drawPersonaChart(data.persona);
+
+generateROI();
+
+}
+
+function drawTrafficChart(values){
+
+const ctx =
+document.getElementById(
+"trafficChart"
+);
+
+if(trafficChart){
+trafficChart.destroy();
+}
+
+trafficChart =
+new Chart(ctx,{
+type:"line",
+data:{
+labels:[
+"周一",
+"周二",
+"周三",
+"周四",
+"周五",
+"周六",
+"周日"
+],
+datasets:[{
+label:"客流量",
+data:values,
+borderWidth:3,
+tension:0.4
+}]
+}
+});
+
+}
+
+function drawPersonaChart(values){
+
+const ctx =
+document.getElementById(
+"personaChart"
+);
+
+if(personaChart){
+personaChart.destroy();
+}
+
+personaChart =
+new Chart(ctx,{
+type:"radar",
+data:{
+labels:[
+"亲子游客",
+"年轻游客",
+"银发游客",
+"本地游客",
+"外地游客",
+"夜游游客"
+],
+datasets:[{
+label:"游客画像",
+data:values,
+borderWidth:2
+}]
+}
+});
+
+}
+
+function generateROI(){
+
+document.getElementById(
+"trafficROI"
+).innerText =
+"+"+(25+Math.floor(Math.random()*15))+"%";
+
+document.getElementById(
+"ticketROI"
+).innerText =
+"+"+(18+Math.floor(Math.random()*12))+"%";
+
+document.getElementById(
+"consumeROI"
+).innerText =
+"+"+(30+Math.floor(Math.random()*20))+"%";
+
+document.getElementById(
+"exposureROI"
+).innerText =
+"+"+(120+Math.floor(Math.random()*120))+"%";
+
+}
+
+document
+.getElementById("spotSelect")
+.addEventListener(
+"change",
+loadScenicData
+);
+
+async function generatePlan(){
+
+const apiKey =
+document
+.getElementById("apiKey")
+.value
+.trim();
+
+const scenic =
+document
+.getElementById("spotSelect")
+.value;
+
+const resultBox =
+document
+.getElementById("result");
+
+if(!apiKey){
+
+alert(
+"请输入DeepSeek API Key"
+);
+
 return;
+
 }
 
 resultBox.innerHTML =
@@ -436,7 +791,8 @@ const prompt = `
 你是一名中国文旅行业增长顾问。
 
 请针对景区：
-${spotName}
+
+${scenic}
 
 输出：
 
@@ -446,17 +802,21 @@ ${spotName}
 
 【增长机会】
 
-【新媒体运营建议】
+【新媒体运营策略】
 
-【短视频内容方向】
+【短视频选题】
 
-【180天增长策略】
+【私域运营建议】
+
+【180天增长规划】
 
 要求：
+
 专业、具体、可执行。
 `;
 
-const response = await fetch(
+const response =
+await fetch(
 "https://api.deepseek.com/v1/chat/completions",
 {
 method:"POST",
@@ -477,7 +837,8 @@ temperature:0.7
 }
 );
 
-const data = await response.json();
+const data =
+await response.json();
 
 if(
 data &&
@@ -485,67 +846,32 @@ data.choices &&
 data.choices.length
 ){
 
-const aiText =
-data.choices[0].message.content;
-
-resultBox.innerText = aiText;
-
-generateDashboardData();
+resultBox.innerText =
+data.choices[0]
+.message
+.content;
 
 }else{
 
 resultBox.innerHTML =
-"AI返回数据异常，请检查Key是否正确。";
+"AI返回异常，请检查Key是否有效。";
 
 }
 
 }catch(error){
 
 resultBox.innerHTML =
-"调用失败：" + error.message;
+"调用失败："
++
+error.message;
 
 }
 
 }
-function generateDashboardData(){
 
-const growth =
-80 + Math.floor(Math.random()*18);
+loadScenicData();
+</script>
 
-document.getElementById("growthScore")
-.innerText = growth;
+</body>
 
-document.getElementById("brandScore")
-.innerText =
-85 + Math.floor(Math.random()*12);
-
-document.getElementById("spreadScore")
-.innerText =
-86 + Math.floor(Math.random()*12);
-
-document.getElementById("convertScore")
-.innerText =
-82 + Math.floor(Math.random()*12);
-
-document.getElementById("repurchaseScore")
-.innerText =
-80 + Math.floor(Math.random()*12);
-
-document.getElementById("trafficROI")
-.innerText =
-"+"+(20+Math.floor(Math.random()*30))+"%";
-
-document.getElementById("ticketROI")
-.innerText =
-"+"+(15+Math.floor(Math.random()*25))+"%";
-
-document.getElementById("consumeROI")
-.innerText =
-"+"+(20+Math.floor(Math.random()*40))+"%";
-
-document.getElementById("exposureROI")
-.innerText =
-"+"+(100+Math.floor(Math.random()*200))+"%";
-
-}
-generateDashboardData();
+</html>
